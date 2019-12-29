@@ -65,6 +65,7 @@
             // 
             // pnlImageOuter
             // 
+            this.pnlImageOuter.AutoScroll = true;
             this.pnlImageOuter.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlImageOuter.Location = new System.Drawing.Point(202, 3);
             this.pnlImageOuter.Name = "pnlImageOuter";

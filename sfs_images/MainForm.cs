@@ -25,9 +25,7 @@ namespace sfs_images
             InitializeComponent();
             if (!util.GeotiffHelper.GetGdalDrivers())
                 throw new Exception("Couldn't get GDAL drivers");
-            var pnl = new SourceImagePanel { AutoScroll = true, Dock = DockStyle.Fill };
-            pnl.Controls.Add(ImageBox = new SingleSourceImageBox { Location = new Point(0, 0), Size = new Size(100,100) });
-            pnlImageOuter.Controls.Add(pnl);
+            pnlImageOuter.Controls.Add(ImageBox = new SingleSourceImageBox { Location = new Point(0, 0), Size = new Size(100,100) });
             Directory.CreateDirectory(TempDirectory);
             lvFiles_SizeChanged(null, null);
             LoadImages(ImageDirectory);
@@ -236,20 +234,6 @@ namespace sfs_images
             // GC.SuppressFinalize(this);
         }
         #endregion
-    }
-
-    public class SourceImagePanel : Panel
-    {
-        public SourceImagePanel()
-        {
-            this.DoubleBuffered = true;
-
-            // or
-
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            UpdateStyles();
-        }
     }
 
     public class SingleSourceImageBox : Control
