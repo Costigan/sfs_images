@@ -46,7 +46,10 @@ namespace sfs_images
             set
             {
                 var i1 = Math.DivRem(i, 32, out int r);
-                Data[i1] |= (uint)(1 << r);
+                if (value)
+                    Data[i1] |= (uint)(1 << r);
+                else
+                    Data[i1] &= ~(uint)(1 << r);
             }
         }
 
@@ -62,7 +65,7 @@ namespace sfs_images
             }
         }
 
-        public void Copy(LitPatches other)
+        public void CopyFrom(LitPatches other)
         {
             Debug.Assert(Length == other.Length && Width == other.Width && Height == other.Height);
             var len = Length;

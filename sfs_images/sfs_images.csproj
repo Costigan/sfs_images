@@ -131,6 +131,7 @@
   <ItemGroup>
     <Content Include="GdalConfiguration.vb" />
     <Content Include="License-LGPL.txt" />
+    <Content Include="notes.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

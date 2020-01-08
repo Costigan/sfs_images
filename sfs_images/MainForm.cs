@@ -14,7 +14,7 @@ namespace sfs_images
 {
     public partial class MainForm : Form
     {
-        public static string ImageDirectory = @"C:\projects\sfs_images\nobile\low";
+        public static string ImageDirectory = @"C:\projects\sfs_images\nobile\med";
         public static string TempDirectory = @"tmp";
         public static string ProjectedDirectory = @"projected";
 
@@ -274,21 +274,37 @@ namespace sfs_images
         {
             var list = new LinkedList<SourceImage>(EnumerateSourceImages().Where(s => s.HasProjectedImage));
             if (list.First == null) return;
-            var covering_set = new LitPatches(list.First.Value.CachedProjectedImage.Width, list.First.Value.CachedProjectedImage.Height);
-            var length = (double)covering_set.Length;
-            var candidate = new LitPatches(covering_set.Width, covering_set.Height);
+
+            var covering_set_lit = new LitPatches(list.First.Value.CachedProjectedImage.Width, list.First.Value.CachedProjectedImage.Height);
+            var length = (double)covering_set_lit.Length;
+            var covering_set_count = new int[covering_set_lit.Length];
+            var covering_set = new List<SourceImage>();
+
+            var candidate_lit = new LitPatches(covering_set_lit.Width, covering_set_lit.Height);
             var count = list.Count;
             var values = new PointPairList();
+            
             for (var i = 0; i < count; i++)
             {
-                var current_score = covering_set.Count;
+                PrepareCoveringSetLit(covering_set, minimum_cover, covering_set_lit);
+                var current_score = covering_set_lit.Count;
                 var best_node_score = current_score;
                 Console.WriteLine($"{i:D5}/{count:D5}  current_score={current_score}");
                 LinkedListNode<SourceImage> best_node = null;
                 var node = list.First;
                 while (node != null)
                 {
-                    var score = Score(node.Value);
+                    candidate_lit.CopyFrom(covering_set_lit);
+                    candidate_lit.Or(node.Value.LitPatches);
+                    if (covering_set_lit.IsEqual(candidate_lit))
+                    {
+                        // Since covering_set must get monotonically better, this source image can't ever improve the coverage
+                        //var next = node.Next;
+                        //list.Remove(node);
+                        //node = next;
+                        //continue;
+                    }
+                    var score = candidate_lit.Count;
                     if (score > best_node_score)
                     {
                         best_node_score = score;
@@ -300,10 +316,11 @@ namespace sfs_images
                 values.Add(values.Count, current_score / length);
                 if (best_node == null)
                     break;
-                covering_set.Or(best_node.Value.LitPatches);
+                covering_set_lit.Or(best_node.Value.LitPatches);
                 list.Remove(best_node);
+                covering_set.Add(best_node.Value);
             }
-            values.Add(values.Count, covering_set.Count / length);
+            values.Add(values.Count, covering_set_lit.Count / length);
 
             Console.WriteLine($"values.count={values.Count}");
 
@@ -318,12 +335,26 @@ namespace sfs_images
             zedPlotScoreHistory.AxisChange();
             zedPlotScoreHistory.Invalidate();
 
-
             int Score(SourceImage s)
             {
-                candidate.Copy(covering_set);
-                candidate.Or(s.LitPatches);
-                return candidate.Count;
+                candidate_lit.CopyFrom(covering_set_lit);
+                candidate_lit.Or(s.LitPatches);
+                return candidate_lit.Count;
+            }
+
+            void PrepareCoveringSetLit(List<SourceImage> set, int minimal_cover, LitPatches result)
+            {
+                var len = covering_set_count.Length;
+                Array.Clear(covering_set_count, 0, covering_set_count.Length);
+                foreach (var s in set)
+                {
+                    var lit = s.LitPatches;
+                    for (var i = 0; i < len; i++)
+                        if (lit[i]) covering_set_count[i]++;
+                }
+                result.Clear();
+                for (var i = 0; i < len; i++)
+                    result[i] = covering_set_count[i] >= minimal_cover;
             }
         }
 
