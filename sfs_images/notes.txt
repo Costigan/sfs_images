@@ -1,0 +1,9 @@
+﻿winpty docker run --rm -it -v "c:\projects\sfs_images\nobile\test\:/data" seignovert/usgs-isis3 bash
+
+
+usgs@0deb42442a3e:/data$ lronac2isis from=M104270814LE.IMG to=M104270814LE.cub
+**I/O ERROR** Unable to open [/usgs/data/lro/translations/lronacInstrument.trn].
+
+Addressing this by running this in the conainer (and not letting it get removed):
+
+rsync -azv --delete --exclude='kernels' isisdist.wr.usgs.gov::isis3data/data/lro /usgs/data/

@@ -1,0 +1,14 @@
+﻿sfs
+
+  --help
+  --projected <dir>
+  --pattern <source_image_pattern>
+  --overlay
+
+  <directory>
+  
+  
+outputs
+csv file describing images
+
+  
